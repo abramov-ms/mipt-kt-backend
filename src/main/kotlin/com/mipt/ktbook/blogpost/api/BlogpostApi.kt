@@ -11,8 +11,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
-const val MAX_POST_LENGTH = 500
-const val POSTS_PER_PAGE = 50L
+private const val MAX_POST_LENGTH = 500
+private const val POSTS_PER_PAGE = 50L
 
 fun Application.addBlogpostApi() {
     routing {
