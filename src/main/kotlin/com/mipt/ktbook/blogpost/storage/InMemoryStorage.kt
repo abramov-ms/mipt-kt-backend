@@ -7,9 +7,9 @@ import java.time.Instant
 import kotlin.math.min
 
 class InMemoryStorage : Storage {
-    private var monotonicId: Long = 0
-    private val posts: MutableSet<Blogpost> = mutableSetOf()
-    private val mutex: Mutex = Mutex()
+    private var monotonicId = 0L
+    private val posts = mutableSetOf<Blogpost>()
+    private val mutex = Mutex()
 
     override suspend fun createPost(body: String): Blogpost {
         mutex.withLock {
