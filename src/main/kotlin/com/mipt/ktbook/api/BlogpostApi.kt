@@ -1,8 +1,8 @@
 package com.mipt.ktbook.api
 
-import com.mipt.ktbook.api.model.CreateRequest
-import com.mipt.ktbook.api.model.CreateResponse
-import com.mipt.ktbook.api.model.EditRequest
+import com.mipt.ktbook.api.model.CreatePostRequest
+import com.mipt.ktbook.api.model.CreatePostResponse
+import com.mipt.ktbook.api.model.EditPostRequest
 import com.mipt.ktbook.model.User
 import com.mipt.ktbook.storage.Storage
 import io.ktor.http.*
@@ -61,14 +61,14 @@ fun Application.addBlogpostApi() {
 
         authenticate("auth-jwt") {
             put("/posts") {
-                val request = call.receive<CreateRequest>()
+                val request = call.receive<CreatePostRequest>()
                 if (request.postBody.length > MAX_POST_LENGTH) {
                     call.respond(HttpStatusCode.BadRequest, "Post is too long")
                     return@put
                 }
 
                 val post = storage.createPost(request.postBody, author = getPrincipalUser(storage))
-                call.respond(CreateResponse(post.id))
+                call.respond(CreatePostResponse(post.id))
             }
 
             patch("/posts/{id}") {
@@ -89,7 +89,7 @@ fun Application.addBlogpostApi() {
                     return@patch
                 }
 
-                val request = call.receive<EditRequest>()
+                val request = call.receive<EditPostRequest>()
                 assert(storage.updatePost(id, request.newBody))
                 call.respond(HttpStatusCode.OK)
             }
