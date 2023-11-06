@@ -1,6 +1,7 @@
 package com.mipt.ktbook.storage.impl
 
 import com.mipt.ktbook.model.Blogpost
+import com.mipt.ktbook.model.User
 import com.mipt.ktbook.storage.Storage
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -10,13 +11,18 @@ import kotlin.math.min
 class InMemoryStorage : Storage {
     private var monotonicId = 0L
     private val posts = mutableSetOf<Blogpost>()
+    private val users = mutableSetOf<User>()
     private val mutex = Mutex()
 
-    override suspend fun createPost(body: String): Blogpost {
+    override suspend fun createPost(body: String, author: User): Blogpost {
         mutex.withLock {
             val now = Instant.now().epochSecond
             val post = Blogpost(
-                monotonicId, body, createdEpochSeconds = now, modifiedEpochSeconds = now
+                monotonicId,
+                body,
+                createdEpochSeconds = now,
+                modifiedEpochSeconds = now,
+                author
             )
             posts.add(post)
             ++monotonicId
@@ -52,7 +58,8 @@ class InMemoryStorage : Storage {
                     id,
                     newBody,
                     post.createdEpochSeconds,
-                    modifiedEpochSeconds = Instant.now().epochSecond
+                    modifiedEpochSeconds = Instant.now().epochSecond,
+                    post.author
                 )
             )
 
@@ -63,6 +70,24 @@ class InMemoryStorage : Storage {
     override suspend fun deletePost(id: Long): Boolean {
         mutex.withLock {
             return posts.removeIf { it.id == id }
+        }
+    }
+
+    override suspend fun createUser(username: String, password: String, realName: String): User? {
+        mutex.withLock {
+            if (users.find { it.username == username } != null) {
+                return null
+            }
+
+            val user = User(username, password, realName, Instant.now().epochSecond);
+            users.add(user)
+            return user
+        }
+    }
+
+    override suspend fun getUser(username: String): User? {
+        mutex.withLock {
+            return users.find { it.username == username }
         }
     }
 }

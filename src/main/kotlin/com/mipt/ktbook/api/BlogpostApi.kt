@@ -3,9 +3,12 @@ package com.mipt.ktbook.api
 import com.mipt.ktbook.api.model.CreateRequest
 import com.mipt.ktbook.api.model.CreateResponse
 import com.mipt.ktbook.api.model.EditRequest
+import com.mipt.ktbook.model.User
 import com.mipt.ktbook.storage.Storage
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -19,20 +22,15 @@ fun PipelineContext<Unit, ApplicationCall>.getPathParameter(name: String): Strin
     return call.parameters[name]
 }
 
+suspend fun PipelineContext<Unit, ApplicationCall>.getPrincipalUser(storage: Storage): User {
+    val principal = call.principal<JWTPrincipal>()!!
+    val username = principal.payload.getClaim("username").asString()
+    return storage.getUser(username)!!
+}
+
 fun Application.addBlogpostApi() {
     routing {
         val storage by inject<Storage>()
-
-        put("/posts") {
-            val request = call.receive<CreateRequest>()
-            if (request.postBody.length > MAX_POST_LENGTH) {
-                call.respond(HttpStatusCode.BadRequest, "Post is too long")
-                return@put
-            }
-
-            val post = storage.createPost(request.postBody)
-            call.respond(CreateResponse(post.id))
-        }
 
         get("/posts/{id}") {
             val id = getPathParameter("id")?.toLongOrNull()
@@ -61,35 +59,63 @@ fun Application.addBlogpostApi() {
             call.respond(storage.getPostRange(offset, POSTS_PER_PAGE))
         }
 
-        patch("/posts/{id}") {
-            val id = getPathParameter("id")?.toLongOrNull()
-            if (id == null) {
-                call.respond(HttpStatusCode.BadRequest, "Bad id format")
-                return@patch
+        authenticate("auth-jwt") {
+            put("/posts") {
+                val request = call.receive<CreateRequest>()
+                if (request.postBody.length > MAX_POST_LENGTH) {
+                    call.respond(HttpStatusCode.BadRequest, "Post is too long")
+                    return@put
+                }
+
+                val post = storage.createPost(request.postBody, author = getPrincipalUser(storage))
+                call.respond(CreateResponse(post.id))
             }
 
-            val request = call.receive<EditRequest>()
-            if (!storage.updatePost(id, request.newBody)) {
-                call.respond(HttpStatusCode.BadRequest, "No such post")
-                return@patch
+            patch("/posts/{id}") {
+                val id = getPathParameter("id")?.toLongOrNull()
+                if (id == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Bad id format")
+                    return@patch
+                }
+
+                val post = storage.getPost(id)
+                if (post == null) {
+                    call.respond(HttpStatusCode.BadRequest, "No such post")
+                    return@patch
+                }
+
+                if (post.author != getPrincipalUser(storage)) {
+                    call.respond(HttpStatusCode.Forbidden)
+                    return@patch
+                }
+
+                val request = call.receive<EditRequest>()
+                assert(storage.updatePost(id, request.newBody))
+                call.respond(HttpStatusCode.OK)
             }
 
-            call.respond(HttpStatusCode.OK)
+            delete("/posts/{id}") {
+                val id = getPathParameter("id")?.toLongOrNull()
+                if (id == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Bad id format")
+                    return@delete
+                }
+
+                val post = storage.getPost(id)
+                if (post == null) {
+                    call.respond(HttpStatusCode.BadRequest, "No such post")
+                    return@delete
+                }
+
+                if (post.author != getPrincipalUser(storage)) {
+                    call.respond(HttpStatusCode.Forbidden)
+                    return@delete
+                }
+
+                assert(storage.deletePost(id))
+                call.respond(HttpStatusCode.OK)
+            }
         }
 
-        delete("/posts/{id}") {
-            val id = getPathParameter("id")?.toLongOrNull()
-            if (id == null) {
-                call.respond(HttpStatusCode.BadRequest, "Bad id format")
-                return@delete
-            }
-
-            if (!storage.deletePost(id)) {
-                call.respond(HttpStatusCode.BadRequest, "No such post")
-                return@delete
-            }
-
-            call.respond(HttpStatusCode.OK)
-        }
     }
 }
