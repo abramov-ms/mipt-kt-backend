@@ -1,8 +1,8 @@
-package com.mipt.ktbook.blogpost.api.model
+package com.mipt.ktbook.api.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class EditRequest(
+data class EditPostRequest(
     val newBody: String
 )
