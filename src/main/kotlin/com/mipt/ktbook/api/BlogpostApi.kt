@@ -107,7 +107,7 @@ fun Application.addBlogpostApi() {
                 }
 
                 val request = call.receive<EditPostRequest>()
-                assert(storage.updatePost(id, request.newBody))
+                storage.updatePost(post, request.newBody)
                 call.respond(HttpStatusCode.OK)
             }
 
@@ -129,7 +129,7 @@ fun Application.addBlogpostApi() {
                     return@delete
                 }
 
-                assert(storage.deletePost(id))
+                storage.deletePost(post)
                 call.respond(HttpStatusCode.OK)
             }
         }

@@ -45,31 +45,24 @@ class InMemoryStorage : Storage {
         }
     }
 
-    override suspend fun updatePost(id: Long, newBody: String): Boolean {
+    override suspend fun updatePost(post: Blogpost, newBody: String) {
         mutex.withLock {
-            val post = posts.find { it.id == id }
-            if (post == null) {
-                return false
-            }
-
             posts.remove(post)
             posts.add(
                 Blogpost(
-                    id,
+                    post.id,
                     newBody,
                     post.createdEpochSeconds,
                     modifiedEpochSeconds = Instant.now().epochSecond,
                     post.author
                 )
             )
-
-            return true
         }
     }
 
-    override suspend fun deletePost(id: Long): Boolean {
+    override suspend fun deletePost(post: Blogpost) {
         mutex.withLock {
-            return posts.removeIf { it.id == id }
+            posts.remove(post)
         }
     }
 
