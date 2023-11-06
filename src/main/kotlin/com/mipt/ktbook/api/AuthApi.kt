@@ -24,6 +24,11 @@ fun Application.addAuthApi() {
 
         post("/user/signup") {
             val request = call.receive<SignupRequest>()
+            if (request.username.isEmpty() || !request.username.all { it.isLetterOrDigit() }) {
+                call.respond(HttpStatusCode.BadRequest, "Bad username")
+                return@post
+            }
+
             val user = storage.createUser(request.username, request.password, request.realName)
             if (user == null) {
                 call.respond(HttpStatusCode.Forbidden, "User already exists")
@@ -41,9 +46,7 @@ fun Application.addAuthApi() {
                 return@post
             }
 
-            val token = JWT.create()
-                .withAudience(audience)
-                .withIssuer(issuer)
+            val token = JWT.create().withAudience(audience).withIssuer(issuer)
                 .withClaim("username", user.username)
                 .withExpiresAt(Date(System.currentTimeMillis() + 60_000_000))
                 .sign(Algorithm.HMAC256(secret))
