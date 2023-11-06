@@ -31,19 +31,13 @@ fun Application.configureServer() {
     install(Authentication) {
         jwt("auth-jwt") {
             realm = myRealm
-
             verifier(
-                JWT
-                    .require(Algorithm.HMAC256(secret))
-                    .withAudience(audience)
-                    .withIssuer(issuer)
+                JWT.require(Algorithm.HMAC256(secret)).withAudience(audience).withIssuer(issuer)
                     .build()
             )
-
             validate { credential ->
                 JWTPrincipal(credential.payload)
             }
-
             challenge { _, _ ->
                 call.respond(HttpStatusCode.Unauthorized, "Token is not valid or has expired")
             }

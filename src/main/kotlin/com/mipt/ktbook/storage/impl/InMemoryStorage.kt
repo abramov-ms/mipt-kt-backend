@@ -19,11 +19,7 @@ class InMemoryStorage : Storage {
         mutex.withLock {
             val now = Instant.now().epochSecond
             val post = Blogpost(
-                monotonicId,
-                body,
-                createdEpochSeconds = now,
-                modifiedEpochSeconds = now,
-                author
+                monotonicId, body, createdEpochSeconds = now, modifiedEpochSeconds = now, author
             )
             posts.add(post)
             ++monotonicId
@@ -72,7 +68,6 @@ class InMemoryStorage : Storage {
             if (users.find { it.username == username } != null) {
                 return null
             }
-
 
             val user = User(
                 username,
