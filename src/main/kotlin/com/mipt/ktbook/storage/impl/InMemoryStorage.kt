@@ -1,4 +1,4 @@
-package com.mipt.ktbook.storage.memory
+package com.mipt.ktbook.storage.impl
 
 import com.mipt.ktbook.model.Blogpost
 import com.mipt.ktbook.storage.Storage
