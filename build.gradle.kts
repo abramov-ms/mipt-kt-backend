@@ -28,6 +28,8 @@ dependencies {
 
     val logbackVersion = "1.2.9"
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+
+    implementation("org.mindrot:jbcrypt:0.4")
 }
 
 tasks.test {

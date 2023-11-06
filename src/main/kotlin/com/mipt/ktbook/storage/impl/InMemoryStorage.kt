@@ -5,6 +5,7 @@ import com.mipt.ktbook.model.User
 import com.mipt.ktbook.storage.Storage
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.mindrot.jbcrypt.BCrypt
 import java.time.Instant
 import kotlin.math.min
 
@@ -72,7 +73,13 @@ class InMemoryStorage : Storage {
                 return null
             }
 
-            val user = User(username, password, realName, Instant.now().epochSecond);
+
+            val user = User(
+                username,
+                BCrypt.hashpw(password, BCrypt.gensalt()),
+                realName,
+                Instant.now().epochSecond
+            );
             users.add(user)
             return user
         }

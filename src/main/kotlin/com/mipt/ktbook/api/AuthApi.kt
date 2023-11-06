@@ -11,6 +11,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
+import org.mindrot.jbcrypt.BCrypt
 import java.util.*
 
 fun Application.addAuthApi() {
@@ -35,7 +36,7 @@ fun Application.addAuthApi() {
         post("/user/login") {
             val request = call.receive<LoginRequest>()
             val user = storage.getUser(request.username)
-            if (user == null || user.password != request.password) {
+            if (user == null || !BCrypt.checkpw(request.password, user.passwordHash)) {
                 call.respond(HttpStatusCode.Forbidden, "Wrong username or password")
                 return@post
             }
