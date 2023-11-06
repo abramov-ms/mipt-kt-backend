@@ -1,9 +1,9 @@
-package com.mipt.ktbook.blogpost.api
+package com.mipt.ktbook.api
 
-import com.mipt.ktbook.blogpost.api.model.CreateRequest
-import com.mipt.ktbook.blogpost.api.model.CreateResponse
-import com.mipt.ktbook.blogpost.api.model.EditRequest
-import com.mipt.ktbook.blogpost.storage.Storage
+import com.mipt.ktbook.api.model.CreateRequest
+import com.mipt.ktbook.api.model.CreateResponse
+import com.mipt.ktbook.api.model.EditRequest
+import com.mipt.ktbook.storage.Storage
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

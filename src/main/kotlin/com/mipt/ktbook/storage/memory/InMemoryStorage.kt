@@ -1,7 +1,7 @@
-package com.mipt.ktbook.blogpost.storage.memory
+package com.mipt.ktbook.storage.memory
 
-import com.mipt.ktbook.blogpost.model.Blogpost
-import com.mipt.ktbook.blogpost.storage.Storage
+import com.mipt.ktbook.model.Blogpost
+import com.mipt.ktbook.storage.Storage
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.Instant

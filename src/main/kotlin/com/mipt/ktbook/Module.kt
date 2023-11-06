@@ -1,7 +1,7 @@
-package com.mipt.ktbook.blogpost
+package com.mipt.ktbook
 
-import com.mipt.ktbook.blogpost.storage.memory.InMemoryStorage
-import com.mipt.ktbook.blogpost.storage.Storage
+import com.mipt.ktbook.storage.memory.InMemoryStorage
+import com.mipt.ktbook.storage.Storage
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module

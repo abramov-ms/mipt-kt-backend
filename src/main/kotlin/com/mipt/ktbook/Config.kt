@@ -1,6 +1,5 @@
 package com.mipt.ktbook
 
-import com.mipt.ktbook.blogpost.blogpostModule
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*

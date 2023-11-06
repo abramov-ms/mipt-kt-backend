@@ -1,6 +1,6 @@
 package com.mipt.ktbook
 
-import com.mipt.ktbook.blogpost.api.addBlogpostApi
+import com.mipt.ktbook.api.addBlogpostApi
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 

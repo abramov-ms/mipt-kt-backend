@@ -1,4 +1,4 @@
-package com.mipt.ktbook.blogpost.model
+package com.mipt.ktbook.model
 
 import kotlinx.serialization.Serializable
 

@@ -1,6 +1,6 @@
-package com.mipt.ktbook.blogpost.storage
+package com.mipt.ktbook.storage
 
-import com.mipt.ktbook.blogpost.model.Blogpost
+import com.mipt.ktbook.model.Blogpost
 
 interface Storage {
     suspend fun createPost(body: String): Blogpost
