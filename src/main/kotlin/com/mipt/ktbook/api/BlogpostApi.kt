@@ -3,6 +3,7 @@ package com.mipt.ktbook.api
 import com.mipt.ktbook.api.model.CreatePostRequest
 import com.mipt.ktbook.api.model.CreatePostResponse
 import com.mipt.ktbook.api.model.EditPostRequest
+import com.mipt.ktbook.api.model.GetPostResponse
 import com.mipt.ktbook.model.User
 import com.mipt.ktbook.storage.Storage
 import io.ktor.http.*
@@ -45,7 +46,15 @@ fun Application.addBlogpostApi() {
                 return@get
             }
 
-            call.respond(post)
+            call.respond(
+                GetPostResponse(
+                    post.id,
+                    post.body,
+                    post.createdEpochSeconds,
+                    post.modifiedEpochSeconds,
+                    post.author.username
+                )
+            )
         }
 
         get("/posts/pages/{num}") {
@@ -56,7 +65,15 @@ fun Application.addBlogpostApi() {
             }
 
             val offset = pageNo * POSTS_PER_PAGE
-            call.respond(storage.getPostRange(offset, POSTS_PER_PAGE))
+            call.respond(storage.getPostRange(offset, POSTS_PER_PAGE).map {
+                GetPostResponse(
+                    it.id,
+                    it.body,
+                    it.createdEpochSeconds,
+                    it.modifiedEpochSeconds,
+                    it.author.username
+                )
+            })
         }
 
         authenticate("auth-jwt") {
