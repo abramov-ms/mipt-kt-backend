@@ -9,10 +9,15 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.pipeline.*
 import org.koin.ktor.ext.inject
 
 private const val MAX_POST_LENGTH = 500
 private const val POSTS_PER_PAGE = 50L
+
+fun PipelineContext<Unit, ApplicationCall>.getPathParameter(name: String): String? {
+    return call.parameters[name]
+}
 
 fun Application.addBlogpostApi() {
     routing {
@@ -30,7 +35,7 @@ fun Application.addBlogpostApi() {
         }
 
         get("/posts/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
+            val id = getPathParameter("id")?.toLongOrNull()
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest, "Bad id format")
                 return@get
@@ -46,7 +51,7 @@ fun Application.addBlogpostApi() {
         }
 
         get("/posts/pages/{num}") {
-            val pageNo = call.parameters["num"]?.toLongOrNull()
+            val pageNo = getPathParameter("num")?.toLongOrNull()
             if (pageNo == null) {
                 call.respond(HttpStatusCode.BadRequest, "Bad page no. format")
                 return@get
@@ -57,7 +62,7 @@ fun Application.addBlogpostApi() {
         }
 
         patch("/posts/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
+            val id = getPathParameter("id")?.toLongOrNull()
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest, "Bad id format")
                 return@patch
@@ -73,7 +78,7 @@ fun Application.addBlogpostApi() {
         }
 
         delete("/posts/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
+            val id = getPathParameter("id")?.toLongOrNull()
             if (id == null) {
                 call.respond(HttpStatusCode.BadRequest, "Bad id format")
                 return@delete
